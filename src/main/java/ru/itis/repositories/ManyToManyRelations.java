@@ -14,19 +14,16 @@ public class ManyToManyRelations {
         this.connection = connection;
     }
 
-    private static final String SQL_SELECT_RELATIONSHIPS = "select ? from ? where ? = ?";
-    private static final String SQL_INSERT_RELATIONSHIPS = "insert into ? (?, ?) values (?, ?)";
-    private static final String SQL_DELETE_RELATIONSHIPS = "delete from ? where ? = ?";
-    private static final String SQL_INSERT_RELATIONSHIP = "insert into ? (?, ?) values (?, ?)";
-    private static final String SQL_DELETE_RELATIONSHIP = "delete from ? where ? = ?";
+    private static final String SQL_SELECT_RELATIONSHIPS = "select %s from %s where %s = ?";
+    private static final String SQL_INSERT_RELATIONSHIPS = "insert into %s (%s, %s) values (?, ?)";
+    private static final String SQL_DELETE_RELATIONSHIPS = "delete from %s where %s = ?";
+    private static final String SQL_DELETE_ALL_RELATIONSHIPS = "delete from %s where %s = ? and %s = ?";
 
     public List<Long> getRelatedIds(String table, String targetColumn, String sourceColumn, Long sourceId) throws SQLException {
         List<Long> ids = new ArrayList<>();
-        PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_RELATIONSHIPS);
-        preparedStatement.setString(1, targetColumn);
-        preparedStatement.setString(2, table);
-        preparedStatement.setString(3, sourceColumn);
-        preparedStatement.setLong(4, sourceId);
+        String CUSTOM_SQL_SELECT_RELATIONSHIPS = String.format(SQL_SELECT_RELATIONSHIPS, targetColumn, table, sourceColumn);
+        PreparedStatement preparedStatement = connection.prepareStatement(CUSTOM_SQL_SELECT_RELATIONSHIPS);
+        preparedStatement.setLong(1, sourceId);
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()) {
             ids.add(resultSet.getLong(targetColumn));
@@ -35,23 +32,28 @@ public class ManyToManyRelations {
     }
 
     public void saveRelatedIds(String table, String targetColumn, String sourceColumn, Long sourceId, List<Long> targetIds) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_RELATIONSHIPS);
-        preparedStatement.setString(1, table);
-        preparedStatement.setString(2, targetColumn);
-        preparedStatement.setString(3, sourceColumn);
+        String CUSTOM_SQL_INSERT_RELATIONSHIPS = String.format(SQL_INSERT_RELATIONSHIPS, table, targetColumn, sourceColumn);
+        PreparedStatement preparedStatement = connection.prepareStatement(CUSTOM_SQL_INSERT_RELATIONSHIPS);
         for (Long targetId : targetIds) {
-            preparedStatement.setLong(4, targetId);
-            preparedStatement.setLong(5, sourceId);
+            preparedStatement.setLong(1, targetId);
+            preparedStatement.setLong(2, sourceId);
             preparedStatement.addBatch();
         }
         preparedStatement.executeBatch();
     }
 
     public void deleteRelatedIds(String table, String sourceColumn, Long sourceId) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_RELATIONSHIPS);
-        preparedStatement.setString(1, table);
-        preparedStatement.setString(2, sourceColumn);
-        preparedStatement.setLong(3, sourceId);
+        String CUSTOM_SQL_DELETE_RELATIONSHIPS = String.format(SQL_DELETE_RELATIONSHIPS, table, sourceColumn);
+        PreparedStatement preparedStatement = connection.prepareStatement(CUSTOM_SQL_DELETE_RELATIONSHIPS);
+        preparedStatement.setLong(1, sourceId);
+        preparedStatement.executeUpdate();
+    }
+
+    public void deleteAllRelations(String table, String targetColumn, String sourceColumn, Long sourceId, Long targetIds) throws SQLException {
+        String CUSTOM_SQL_DELETE_RELATIONSHIPS = String.format(SQL_DELETE_ALL_RELATIONSHIPS, table, targetColumn, sourceColumn);
+        PreparedStatement preparedStatement = connection.prepareStatement(CUSTOM_SQL_DELETE_RELATIONSHIPS);
+        preparedStatement.setLong(1, targetIds);
+        preparedStatement.setLong(2, sourceId);
         preparedStatement.executeUpdate();
     }
 }

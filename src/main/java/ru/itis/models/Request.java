@@ -15,4 +15,5 @@ public class Request {
     private Long device;
     private Long client;
     private UUID identifier;
+    private Long file;
 }

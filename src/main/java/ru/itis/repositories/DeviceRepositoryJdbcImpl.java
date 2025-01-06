@@ -2,6 +2,7 @@ package ru.itis.repositories;
 
 import ru.itis.models.Device;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,10 +20,15 @@ public class DeviceRepositoryJdbcImpl implements DeviceRepository {
     private static final String SQL_UPDATE = "update device set serial_number = ?, color = ?, specification = ? " +
             "where id = ?";
     private static final String SQL_DELETE = "delete from device where id = ?";
+    private static final String SQL_SELECT_BY_SERIAL_NUMBER = "select * from device where serial_number = ? and specification = ?";
 
 
-    DeviceRepositoryJdbcImpl(Connection connection) {
-        this.connection = connection;
+    public DeviceRepositoryJdbcImpl(DataSource dataSource) {
+        try {
+            this.connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -67,10 +73,22 @@ public class DeviceRepositoryJdbcImpl implements DeviceRepository {
     }
 
     @Override
-    public void delete(Device entity) throws SQLException {
+    public void delete(Long id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE);
-        preparedStatement.setLong(1, entity.getId());
+        preparedStatement.setLong(1, id);
         preparedStatement.executeUpdate();
+    }
+
+    @Override
+    public Device findBySerialNumber(String serialNumber, Long specification) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_BY_SERIAL_NUMBER);
+        preparedStatement.setString(1, serialNumber);
+        preparedStatement.setLong(2,  specification);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            return createDevice(resultSet);
+        }
+        return null;
     }
 
     private Device createDevice(ResultSet resultSet) throws SQLException {

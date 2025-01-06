@@ -1,0 +1,39 @@
+.data-list {
+    display: flex;
+    justify-content: center;
+}
+
+.data-list table {
+    width: 85%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.data-list thead th {
+    background-color: var(--secondary-dark);
+    color: var(--text-light-hover);
+}
+
+.data-list tbody tr {
+    text-align: left;
+}
+
+.data-list table th, table td {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+}
+
+.data-list tbody {
+    background-color: var(--form-color);
+}
+
+.data-list tbody tr:hover {
+    background-color: var(--info-color);
+}
+
+.data-list tbody td {
+    color: var(--primary-dark);
+    vertical-align: middle;
+}
+

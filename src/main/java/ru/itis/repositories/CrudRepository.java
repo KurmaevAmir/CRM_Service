@@ -7,5 +7,5 @@ public interface CrudRepository<T> {
     void save(T entity) throws SQLException;
     List<T> findAll() throws SQLException;
     void update(T entity) throws SQLException;
-    void delete(T entity) throws SQLException;
+    void delete(Long id) throws SQLException;
 }

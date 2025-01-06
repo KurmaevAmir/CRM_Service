@@ -6,4 +6,5 @@ import java.sql.SQLException;
 
 public interface DeviceRepository extends CrudRepository<Device> {
     Device findById(Long id) throws SQLException;
+    Device findBySerialNumber(String serialNumber, Long specification) throws SQLException;
 }

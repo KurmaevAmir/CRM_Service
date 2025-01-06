@@ -2,9 +2,11 @@ package ru.itis.repositories;
 
 import ru.itis.models.TypeDevice;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TypeDeviceRepositoryJdbcImpl implements TypeDeviceRepository {
     private final Connection connection;
@@ -14,9 +16,14 @@ public class TypeDeviceRepositoryJdbcImpl implements TypeDeviceRepository {
     private static final String SQL_SELECT_ALL = "select * from typeDevice";
     private static final String SQL_UPDATE = "update typeDevice set name = ? where id = ?";
     private static final String SQL_DELETE = "delete from typeDevice where id = ?";
+    private static final String SQL_SELECT_BY_NAME = "select td.id from typeDevice as td where td.name = ?";
 
-    TypeDeviceRepositoryJdbcImpl(Connection connection) {
-        this.connection = connection;
+    public TypeDeviceRepositoryJdbcImpl(DataSource dataSource) {
+        try {
+            this.connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -63,9 +70,21 @@ public class TypeDeviceRepositoryJdbcImpl implements TypeDeviceRepository {
     }
 
     @Override
-    public void delete(TypeDevice entity) throws SQLException {
+    public void delete(Long id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE);
-        preparedStatement.setLong(1, entity.getId());
+        preparedStatement.setLong(1, id);
         preparedStatement.executeUpdate();
+    }
+
+    @Override
+    public Optional<Long> getIdByName(String name) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_BY_NAME);
+        preparedStatement.setString(1, name);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            return Optional.of(resultSet.getLong(1));
+        } else {
+            return Optional.empty();
+        }
     }
 }

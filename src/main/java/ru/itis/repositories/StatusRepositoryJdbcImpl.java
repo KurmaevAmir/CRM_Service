@@ -2,6 +2,7 @@ package ru.itis.repositories;
 
 import ru.itis.models.Status;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,12 @@ public class StatusRepositoryJdbcImpl implements StatusRepository {
     private static final String SQL_UPDATE = "update status set state = ? where id = ?";
     private static final String SQL_DELETE = "delete from status where id = ?";
 
-    StatusRepositoryJdbcImpl(Connection connection) {
-        this.connection = connection;
+    public StatusRepositoryJdbcImpl(DataSource dataSource) {
+        try {
+            this.connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -57,9 +62,9 @@ public class StatusRepositoryJdbcImpl implements StatusRepository {
     }
 
     @Override
-    public void delete(Status entity) throws SQLException {
+    public void delete(Long id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE);
-        preparedStatement.setLong(1, entity.getId());
+        preparedStatement.setLong(1, id);
         preparedStatement.executeUpdate();
     }
 

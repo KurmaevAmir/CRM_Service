@@ -1,7 +1,9 @@
 package ru.itis.repositories;
 
+import ru.itis.dto.CRM.Client.ClientAjaxDto;
 import ru.itis.models.Client;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +22,16 @@ public class ClientRepositoryJdbcImpl implements ClientRepository {
             "patronymic = ?, date_of_birth = ?, phone_number = ?, email = ?, passport = ?, " +
             "password = ? where id = ?";
     private static final String SQL_DELETE = "delete from client where id = ?";
+    private static final String SQL_SELECT_BY_FULL_NAME = "select * from client where name = ? and surname = ? and patronymic = ?\n" +
+            "union\n" +
+            "select * from client where name = ? and surname = ?";
 
-    ClientRepositoryJdbcImpl(Connection connection) {
-        this.connection = connection;
+    public ClientRepositoryJdbcImpl(DataSource dataSource) {
+        try {
+            this.connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -48,14 +57,13 @@ public class ClientRepositoryJdbcImpl implements ClientRepository {
     }
 
     @Override
-    public List<Client> findByEmail() throws SQLException {
+    public Client findByEmail() throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_BY_EMAIL);
         ResultSet resultSet = preparedStatement.executeQuery();
-        List<Client> clients = new ArrayList<>();
-        while (resultSet.next()) {
-            clients.add(createClient(resultSet));
+        if (resultSet.next()) {
+            return createClient(resultSet);
         }
-        return clients;
+        return null;
     }
 
     @Override
@@ -85,10 +93,28 @@ public class ClientRepositoryJdbcImpl implements ClientRepository {
     }
 
     @Override
-    public void delete(Client entity) throws SQLException {
+    public void delete(Long id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE);
-        preparedStatement.setLong(1, entity.getId());
+        preparedStatement.setLong(1, id);
         preparedStatement.executeUpdate();
+    }
+
+    @Override
+    public List<Client> findByFullName(ClientAjaxDto client) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(SQL_SELECT_BY_FULL_NAME);
+        statement.setString(1, client.getName());
+        statement.setString(2, client.getSurname());
+        statement.setString(3, client.getPatronymic());
+        statement.setString(4, client.getName());
+        statement.setString(5, client.getSurname());
+        ResultSet resultSet = statement.executeQuery();
+
+        List<Client> clients = new ArrayList<>();
+
+        while (resultSet.next()) {
+            clients.add(createClient(resultSet));
+        }
+        return clients;
     }
 
     private Client createClient(ResultSet resultSet) throws SQLException {

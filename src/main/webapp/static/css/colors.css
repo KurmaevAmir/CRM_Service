@@ -1,0 +1,15 @@
+:root {
+    --primary-dark: #222831; /* Тёмный цвет для фона header, footer */
+    --secondary-dark: #393E46; /* Вторичный цвет для фона кнопок при наведении, выделение */
+    --text-light: #EEEEEE; /* Основной цвет текста на тёмном фоне */
+    --text-light-hover: #FFFFFF; /* Цвет текста при наведении на ссылки или кнопки */
+    --accent-color: #00ADB5; /* Цвет для кнопок, ссылок */
+    --background-light: #F8F9FA; /* Фон основного контента */
+    --border-color: #CED4DA; /* Цвет границ элементов */
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Цвет для лёгких теней */
+    --success-color: #28A745; /* Для успешных операций */
+    --warning-color: #FFC107; /* Предупреждения */
+    --danger-color: #DC3545; /* Ошибки */
+    --info-color: #17A2B8; /* Информирование */
+    --form-color: #F7F8FA;
+}

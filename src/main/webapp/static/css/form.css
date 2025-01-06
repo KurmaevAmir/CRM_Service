@@ -1,0 +1,103 @@
+.user-form {
+    font-size: 14px;
+    max-width: 35%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--form-color);
+    border: 1px solid var(--shadow-color);
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-form h1 {
+    color: var(--primary-dark);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.user-form input, button {
+    display: block;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.user-form button {
+    transition-property: all;
+    transition-duration: 0.4s;
+    transition-timing-function: ease-out;
+}
+
+.user-form button.irrevocable {
+    transition-property: all;
+    transition-duration: 0.4s;
+    transition-timing-function: ease-out;
+    background-color: var(--accent-color);
+    color: var(--text-light);
+    border: none;
+    cursor: pointer;
+}
+
+.user-form button.irrevocable:hover {
+    color: var(--text-light-hover);
+    background-color: var(--danger-color);
+}
+
+.user-form button {
+    background-color: var(--accent-color);
+    color: var(--text-light);
+    border: none;
+    cursor: pointer;
+}
+
+.user-form button:hover {
+    color: var(--text-light-hover);
+    background-color: var(--success-color);
+}
+
+p.warn {
+    text-align: center;
+    color: var(--info-color);
+}
+
+.user-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--primary-dark);
+}
+
+.user-form textarea {
+    width: 95%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    resize: vertical;
+    color: var(--primary-dark);
+}
+
+.user-form textarea:focus {
+    outline: none;
+    border-color: var(--warning-color);
+}
+
+.user-form select {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--primary-dark);
+    padding-right: 30px;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}

@@ -6,6 +6,9 @@ import java.sql.Date;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Passport {
     private Long id;
     private String series;

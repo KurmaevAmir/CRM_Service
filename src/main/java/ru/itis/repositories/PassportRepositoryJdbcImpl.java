@@ -2,6 +2,7 @@ package ru.itis.repositories;
 
 import ru.itis.models.Passport;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +17,15 @@ public class PassportRepositoryJdbcImpl implements PassportRepository {
     private static final String SQL_UPDATE = "update passport set series = ?, number = ?, date_issue = ?, " +
             "issued = ?, subdivision = ? where id = ?";
     private static final String SQL_DELETE = "delete from passport where id = ?";
+    private static final String SQL_SELECT_BY_SERIES_AND_NUMBER = "select * from passport where series = ? and number = ?";
+    private static final String SQL_SELECT_COUNT_BY_SERIES_AND_NUMBER = "select count(*) from passport where series = ? and number = ?";
 
-    PassportRepositoryJdbcImpl(Connection connection) {
-        this.connection = connection;
+    public PassportRepositoryJdbcImpl(DataSource dataSource) {
+        try {
+            this.connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -59,10 +66,34 @@ public class PassportRepositoryJdbcImpl implements PassportRepository {
     }
 
     @Override
-    public void delete(Passport entity) throws SQLException {
+    public void delete(Long id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE);
-        preparedStatement.setLong(1, entity.getId());
+        preparedStatement.setLong(1, id);
         preparedStatement.executeUpdate();
+    }
+
+    @Override
+    public Long findIdBySeriesNumber(String series, String number) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_BY_SERIES_AND_NUMBER);
+        preparedStatement.setString(1, series);
+        preparedStatement.setString(2, number);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if(resultSet.next()){
+            return resultSet.getLong("id");
+        }
+        return null;
+    }
+
+    @Override
+    public boolean existsByPassportSeriesAndPassportNumber(String series, String number) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_COUNT_BY_SERIES_AND_NUMBER);
+        preparedStatement.setString(1, series);
+        preparedStatement.setString(2, number);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if(resultSet.next()){
+            return resultSet.getInt(1) > 0;
+        }
+        return false;
     }
 
     private Passport createPassport(ResultSet resultSet) throws SQLException {

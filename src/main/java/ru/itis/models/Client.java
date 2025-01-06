@@ -1,8 +1,12 @@
 package ru.itis.models;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-import java.sql.Date;
 
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
 public class Client extends Human {
 }
